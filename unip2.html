@@ -1,4 +1,358 @@
 <!DOCTYPE html>
+<style id="learning-gallery-styles">
+  body.gallery-open {
+    overflow: hidden;
+  }
+
+  .sc-9105af04-0 img,
+  .sc-9105af04-0 button {
+    cursor: pointer;
+  }
+
+  .learning-gallery[hidden] {
+    display: none;
+  }
+
+  .learning-gallery {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    color: #fff;
+    background: #34424f;
+    font-family: Arial, sans-serif;
+  }
+
+  .learning-gallery__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 48px 8px;
+  }
+
+  .learning-gallery__close,
+  .learning-gallery__action,
+  .learning-gallery__arrow,
+  .learning-gallery__thumb {
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+  }
+
+  .learning-gallery__close {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 18px;
+    padding: 0;
+    font-size: 12px;
+    text-decoration: underline;
+  }
+
+  .learning-gallery__close span:first-child {
+    font-size: 23px;
+    font-weight: 200;
+    line-height: 12px;
+    text-decoration: none;
+  }
+
+  .learning-gallery__title {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .learning-gallery__reference {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .learning-gallery__actions {
+    display: flex;
+    gap: 14px;
+    padding-top: 42px;
+  }
+
+  .learning-gallery__action {
+    padding: 5px;
+    font-size: 25px;
+    opacity: .8;
+  }
+
+  .learning-gallery__action.is-saved {
+    color: #66d5ff;
+    opacity: 1;
+  }
+
+  .learning-gallery__stage {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr) 84px;
+    align-items: center;
+    padding: 8px 24px 16px;
+  }
+
+  .learning-gallery__photo {
+    position: relative;
+    justify-self: center;
+    width: min(62vw, 760px);
+    height: 100%;
+    min-height: 250px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #293642;
+  }
+
+  .learning-gallery__photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+
+  .learning-gallery__counter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 7px 9px;
+    border-radius: 3px;
+    background: rgba(43, 55, 66, .72);
+    font-size: 12px;
+  }
+
+  .learning-gallery__arrow {
+    width: 36px;
+    height: 36px;
+    justify-self: center;
+    border-radius: 50%;
+    color: #34424f;
+    background: #f6f7f8;
+    font-size: 31px;
+    line-height: 31px;
+  }
+
+  .learning-gallery__thumbs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 12px 49px 14px;
+    scrollbar-color: rgba(255, 255, 255, .5) transparent;
+  }
+
+  .learning-gallery__thumb {
+    flex: 0 0 56px;
+    height: 56px;
+    overflow: hidden;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    opacity: .55;
+  }
+
+  .learning-gallery__thumb.is-active {
+    border-color: #fff;
+    opacity: 1;
+  }
+
+  .learning-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  @media (max-width: 700px) {
+    .learning-gallery__header {
+      padding: 14px 18px 5px;
+    }
+
+    .learning-gallery__actions {
+      padding-top: 35px;
+    }
+
+    .learning-gallery__stage {
+      grid-template-columns: 48px minmax(0, 1fr) 48px;
+      padding: 5px 4px 10px;
+    }
+
+    .learning-gallery__photo {
+      width: 100%;
+    }
+
+    .learning-gallery__thumbs {
+      padding: 10px 12px 14px;
+    }
+
+    .learning-gallery__arrow {
+      width: 32px;
+      height: 32px;
+      font-size: 27px;
+    }
+  }
+</style>
+<script id="learning-gallery-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const galleryImages = [
+      { src: "https://picsum.photos/seed/bright-living-room/1200/800", label: "Living room" },
+      { src: "https://picsum.photos/seed/modern-kitchen/1200/800", label: "Kitchen" },
+      { src: "https://picsum.photos/seed/city-bedroom/1200/800", label: "Bedroom" },
+      { src: "https://picsum.photos/seed/sunny-terrace/1200/800", label: "Terrace" },
+      { src: "https://picsum.photos/seed/clean-bathroom/1200/800", label: "Bathroom" },
+      { src: "https://picsum.photos/seed/dining-space/1200/800", label: "Dining room" },
+      { src: "https://picsum.photos/seed/home-office/1200/800", label: "Study area" },
+      { src: "https://picsum.photos/seed/cozy-corner/1200/800", label: "Living room" },
+      { src: "https://picsum.photos/seed/second-bedroom/1200/800", label: "Bedroom 2" },
+      { src: "https://picsum.photos/seed/hallway-view/1200/800", label: "Hallway" },
+      { src: "https://picsum.photos/seed/balcony-light/1200/800", label: "Balcony" },
+      { src: "https://picsum.photos/seed/building-view/1200/800", label: "Building" }
+    ];
+
+    const pageGallery = document.querySelector(".sc-9105af04-0");
+    if (!pageGallery) return;
+
+    const pageImages = Array.from(pageGallery.querySelectorAll("img"));
+    pageImages.forEach(function (image, index) {
+      image.src = galleryImages[index].src;
+      image.alt = galleryImages[index].label;
+      image.loading = index === 0 ? "eager" : "lazy";
+      image.tabIndex = 0;
+      image.setAttribute("role", "button");
+      image.setAttribute("aria-label", "Open gallery at " + galleryImages[index].label);
+    });
+
+    const modal = document.createElement("section");
+    modal.className = "learning-gallery";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Property photo gallery");
+    modal.innerHTML = `
+      <header class="learning-gallery__header">
+        <div>
+          <button type="button" class="learning-gallery__close"><span aria-hidden="true">×</span><span>Close</span></button>
+          <h2 class="learning-gallery__title">Entire Place • El Congrés i els Indians (Sant Andreu)</h2>
+          <p class="learning-gallery__reference">Reference 30543</p>
+        </div>
+        <div class="learning-gallery__actions">
+          <button type="button" class="learning-gallery__action learning-gallery__save" aria-label="Save property" aria-pressed="false">♡</button>
+          <button type="button" class="learning-gallery__action learning-gallery__share" aria-label="Share property">↥</button>
+        </div>
+      </header>
+      <div class="learning-gallery__stage">
+        <button type="button" class="learning-gallery__arrow learning-gallery__previous" aria-label="Previous photo">‹</button>
+        <figure class="learning-gallery__photo">
+          <img class="learning-gallery__main-image" alt="">
+          <figcaption class="learning-gallery__counter"></figcaption>
+        </figure>
+        <button type="button" class="learning-gallery__arrow learning-gallery__next" aria-label="Next photo">›</button>
+      </div>
+      <div class="learning-gallery__thumbs" aria-label="Photo thumbnails"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const mainImage = modal.querySelector(".learning-gallery__main-image");
+    const counter = modal.querySelector(".learning-gallery__counter");
+    const thumbnailRail = modal.querySelector(".learning-gallery__thumbs");
+    const closeButton = modal.querySelector(".learning-gallery__close");
+    const saveButton = modal.querySelector(".learning-gallery__save");
+    let currentIndex = 0;
+    let returnFocus = null;
+
+    galleryImages.forEach(function (photo, index) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "learning-gallery__thumb";
+      button.setAttribute("aria-label", "Show " + photo.label + ", photo " + (index + 1));
+      button.innerHTML = `<img src="${photo.src}" alt="">`;
+      button.addEventListener("click", function () {
+        showPhoto(index);
+      });
+      thumbnailRail.appendChild(button);
+    });
+
+    function showPhoto(index) {
+      currentIndex = (index + galleryImages.length) % galleryImages.length;
+      const photo = galleryImages[currentIndex];
+      mainImage.src = photo.src;
+      mainImage.alt = photo.label;
+      counter.textContent = photo.label + " " + (currentIndex + 1) + " / " + galleryImages.length;
+
+      Array.from(thumbnailRail.children).forEach(function (thumbnail, thumbnailIndex) {
+        const active = thumbnailIndex === currentIndex;
+        thumbnail.classList.toggle("is-active", active);
+        thumbnail.setAttribute("aria-current", active ? "true" : "false");
+        if (active) thumbnail.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      });
+    }
+
+    function openGallery(index, trigger) {
+      returnFocus = trigger;
+      modal.hidden = false;
+      document.body.classList.add("gallery-open");
+      showPhoto(index);
+      closeButton.focus();
+    }
+
+    function closeGallery() {
+      modal.hidden = true;
+      document.body.classList.remove("gallery-open");
+      if (returnFocus) returnFocus.focus();
+    }
+
+    pageImages.forEach(function (image, index) {
+      image.addEventListener("click", function () {
+        openGallery(index, image);
+      });
+      image.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openGallery(index, image);
+        }
+      });
+    });
+
+    const photosButton = pageGallery.querySelector("button");
+    if (photosButton) {
+      photosButton.addEventListener("click", function () {
+        openGallery(0, photosButton);
+      });
+    }
+
+    closeButton.addEventListener("click", closeGallery);
+    modal.querySelector(".learning-gallery__previous").addEventListener("click", function () {
+      showPhoto(currentIndex - 1);
+    });
+    modal.querySelector(".learning-gallery__next").addEventListener("click", function () {
+      showPhoto(currentIndex + 1);
+    });
+
+    saveButton.addEventListener("click", function () {
+      const saved = saveButton.getAttribute("aria-pressed") !== "true";
+      saveButton.setAttribute("aria-pressed", String(saved));
+      saveButton.classList.toggle("is-saved", saved);
+      saveButton.textContent = saved ? "♥" : "♡";
+    });
+
+    modal.querySelector(".learning-gallery__share").addEventListener("click", async function () {
+      const shareData = { title: document.title, url: window.location.href };
+      if (navigator.share) {
+        await navigator.share(shareData).catch(function () {});
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(window.location.href).catch(function () {});
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (modal.hidden) return;
+      if (event.key === "Escape") closeGallery();
+      if (event.key === "ArrowLeft") showPhoto(currentIndex - 1);
+      if (event.key === "ArrowRight") showPhoto(currentIndex + 1);
+    });
+  });
+</script>
 <!-- saved from url=(0055)https://www.uniplaces.com/accommodation/barcelona/30543 -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" data-next-head=""><title data-next-head="">Super cool 3-bedroom flat with terrace - https://uniplaces.com/</title><meta http-equiv="X-UA-Compatible" content="IE=edge" data-next-head=""><meta name="baidu-site-verification" content="codeva-BnFvHwcblM" data-next-head=""><meta name="theme-color" content="#00adef" data-next-head=""><meta name="description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta name="title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="fb:app_id" content="436290349864717" data-next-head=""><meta property="og:title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="og:type" content="website" data-next-head=""><meta property="og:site_name" content="Uniplaces" data-next-head=""><meta property="og:description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="og:image" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:type" content="image/jpeg" data-next-head=""><meta property="og:image:url" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:secure_url" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:alt" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="og:locale" content="en_GB" data-next-head=""><meta property="og:url" content="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><meta property="og:locale:alternate" content="de_DE" data-next-head=""><meta property="og:locale:alternate" content="en_GB" data-next-head=""><meta property="og:locale:alternate" content="es_ES" data-next-head=""><meta property="og:locale:alternate" content="fr_FR" data-next-head=""><meta property="og:locale:alternate" content="it_IT" data-next-head=""><meta property="og:locale:alternate" content="nl_NL" data-next-head=""><meta property="og:locale:alternate" content="pl_PL" data-next-head=""><meta property="og:locale:alternate" content="pt_PT" data-next-head=""><meta property="og:locale:alternate" content="zh_CN" data-next-head=""><meta property="twitter:card" content="summary_large_image" data-next-head=""><meta property="twitter:site" content="@Uniplaces" data-next-head=""><meta property="twitter:creator" content="@uniplaces" data-next-head=""><meta property="twitter:url" content="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><meta property="twitter:title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="twitter:description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="twitter:image" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta name="alexaVerifyID" content="-rCIO1OdzObYj0ckOXGvAr9Jiyg" data-next-head=""><link rel="canonical" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="x-default" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="de" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="en" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="es" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="fr" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="it" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="nl" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="pl" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="pt" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="zh" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="shortcut icon" href="https://static-spa-offer.uniplaces.com/images/icon-48x48.png" data-next-head=""><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-book.woff2" as="font" type="font/woff2" crossorigin="anonymous"><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Organization","name":"Uniplaces","legalName":"Universityplaces - Serviços de Internet, Lda.","url":"https://uniplaces.com/","foundingDate":"2013","logo":"https://uniplaces.com/static/images/logo.png","address":{"@type":"PostalAddress","streetAddress":"Largo Duque do Cadaval N17 Fração I","addressLocality":"Lisbon","postalCode":"1200-160","addressCountry":"Portugal"},"contactPoint":{"@type":"ContactPoint","contactType":"Customer Support","email":"support@uniplaces.com"},"sameAs":["https://facebook.com/uniplaces","https://instagram.com/uniplaces","https://twitter.com/uniplaces","https://youtube.com/user/uniplacesvideos","https://pinterest.com/uniplaces","https://linkedin.com/company/uniplaces","https://blog.uniplaces.com"]}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Product","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/","description":"Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting","image":"https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg","brand":{"@type":"RealEstateAgent","name":"Uniplaces","url":"https://uniplaces.com/"},"offers":{"@type":"Offer","availability":"OnlineOnly","url":"https://uniplaces.com/accommodation/barcelona/30543","price":1700,"priceCurrency":"EUR"}}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Accommodation","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/","description":"Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting","numberOfRooms":3,"photo":"https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg","geo":{"@type":"GeoCoordinates","latitude":"41.42333333333333","longitude":"2.18"},"potentialAction":{"@type":"ReserveAction","target":{"@type":"EntryPoint","urlTemplate":"https://uniplaces.com/accommodation/barcelona/30543","actionPlatform":["http://schema.org/DesktopWebPlatform","http://schema.org/MobileWebPlatform"]},"result":{"@type":"LodgingReservation","name":"Rent Now"}}}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"item":{"@id":"https://uniplaces.com/","name":"Home"}},{"@type":"ListItem","position":2,"item":{"@id":"https://uniplaces.com/accommodation/barcelona","name":"Student accommodation in Barcelona"}},{"@type":"ListItem","position":3,"item":{"@id":"https://uniplaces.com/accommodation/barcelona/neighbourhood/el-congres-i-els-indians-sant-andreu","name":"El Congrés i els Indians (Sant Andreu)"}},{"@type":"ListItem","position":4,"item":{"@id":"https://uniplaces.com/accommodation/barcelona/30543","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/"}}]}</script><style>
   
