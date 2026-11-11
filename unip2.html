@@ -358,17 +358,16 @@
     position: sticky;
     z-index: 10000;
     top: 0;
-    width: 100%;
+    width: min(1200px, calc(100% - 96px));
     min-height: 68px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 28px;
-    padding: 10px 36px;
-    border-bottom: 1px solid #e4eaed;
+    margin: 0 auto;
+    padding: 10px 0;
     color: #224251;
     background: #fff;
-    box-shadow: 0 2px 9px rgba(34, 66, 81, .06);
     font-family: Arial, sans-serif;
   }
 
@@ -497,9 +496,10 @@
 
   @media (max-width: 900px) {
     .hZllxA {
+      width: calc(100% - 32px);
       gap: 16px;
       min-height: 60px;
-      padding: 8px 18px;
+      padding: 8px 0;
     }
 
     .hZllxA .logo {
