@@ -984,6 +984,384 @@
     setActiveSection("Overview");
   });
 </script>
+<style id="learning-booking-summary-styles">
+  .learning-booking-summary {
+    width: 100%;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #d8e0e4;
+    color: #224251;
+    font-family: Arial, sans-serif;
+  }
+
+  .learning-booking-summary__notice {
+    margin: 0 0 18px;
+    color: #52ad58;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .learning-booking-summary__intro {
+    margin-bottom: 18px;
+  }
+
+  .learning-booking-summary__intro strong,
+  .learning-booking-summary__intro span {
+    display: block;
+  }
+
+  .learning-booking-summary__intro strong {
+    margin-bottom: 3px;
+    font-size: 16px;
+  }
+
+  .learning-booking-summary__intro span {
+    color: #647a85;
+    font-size: 14px;
+  }
+
+  .learning-booking-summary__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    margin: 14px 0;
+  }
+
+  .learning-booking-summary__row strong,
+  .learning-booking-summary__row span {
+    display: block;
+  }
+
+  .learning-booking-summary__row strong {
+    margin-bottom: 2px;
+    font-size: 14px;
+  }
+
+  .learning-booking-summary__row span {
+    font-size: 13px;
+  }
+
+  .learning-booking-summary__amount {
+    font-size: 15px !important;
+    text-align: right;
+  }
+
+  .learning-booking-summary__total {
+    padding-top: 12px;
+    border-top: 1px solid #d8e0e4;
+  }
+
+  .learning-booking-summary__total strong,
+  .learning-booking-summary__total .learning-booking-summary__amount {
+    font-size: 17px !important;
+  }
+
+  .learning-booking-summary__guarantee {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 18px 0 14px;
+    color: #52ad58;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .learning-booking-summary__guarantee-icon {
+    font-size: 23px;
+  }
+
+  .learning-booking-summary__review {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    border: 0;
+    color: #647a85;
+    background: transparent;
+    font-size: 14px;
+  }
+
+  .learning-booking-summary__review span:last-child {
+    font-size: 27px;
+    line-height: 18px;
+  }
+
+  .learning-price-details[hidden] {
+    display: none;
+  }
+
+  .learning-price-details {
+    position: fixed;
+    inset: 0;
+    z-index: 115000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, .58);
+    font-family: Arial, sans-serif;
+  }
+
+  .learning-price-details__dialog {
+    width: min(680px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    border-radius: 8px;
+    color: #224251;
+    background: #fff;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, .24);
+  }
+
+  .learning-price-details__header {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 17px 20px;
+    border-bottom: 1px solid #e4eaed;
+    background: #fff;
+  }
+
+  .learning-price-details__header h2 {
+    margin: 0;
+    font: 700 19px Arial, sans-serif;
+  }
+
+  .learning-price-details__close {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    color: #647a85;
+    background: transparent;
+    font-size: 27px;
+    line-height: 27px;
+  }
+
+  .learning-price-details__section {
+    border-bottom: 1px solid #e4eaed;
+  }
+
+  .learning-price-details__toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 20px 10px;
+    border: 0;
+    color: #224251;
+    background: #fff;
+    text-align: left;
+  }
+
+  .learning-price-details__toggle strong {
+    font-size: 15px;
+  }
+
+  .learning-price-details__toggle span {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .learning-price-details__chevron {
+    font-size: 22px !important;
+    transition: transform .2s ease;
+  }
+
+  .learning-price-details__toggle[aria-expanded="true"] .learning-price-details__chevron {
+    transform: rotate(180deg);
+  }
+
+  .learning-price-details__content {
+    padding: 0 20px 12px;
+  }
+
+  .learning-price-details__content[hidden] {
+    display: none;
+  }
+
+  .learning-price-details__line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    padding: 7px 3px;
+    font-size: 13px;
+  }
+
+  .learning-price-details__line.is-total {
+    margin-top: 5px;
+    padding-top: 10px;
+    border-top: 1px solid #e4eaed;
+    font-weight: 700;
+  }
+
+  .learning-price-details__subheading {
+    padding: 8px 3px 4px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .learning-price-details__guarantee {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 16px 20px;
+    color: #52ad58;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 600px) {
+    .learning-price-details {
+      padding: 0;
+    }
+
+    .learning-price-details__dialog {
+      width: 100%;
+      max-height: 100vh;
+      min-height: 100vh;
+      border-radius: 0;
+    }
+  }
+</style>
+<script id="learning-booking-summary-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const pricingBox = document.getElementById("pricing-box");
+    if (!pricingBox) return;
+
+    const detailsModal = document.createElement("section");
+    detailsModal.className = "learning-price-details";
+    detailsModal.hidden = true;
+    detailsModal.setAttribute("role", "dialog");
+    detailsModal.setAttribute("aria-modal", "true");
+    detailsModal.setAttribute("aria-label", "Payment summary");
+    detailsModal.innerHTML = `
+      <div class="learning-price-details__dialog">
+        <header class="learning-price-details__header">
+          <h2>Payment summary</h2>
+          <button type="button" class="learning-price-details__close" aria-label="Close payment summary">×</button>
+        </header>
+        <section class="learning-price-details__section">
+          <button type="button" class="learning-price-details__toggle" aria-expanded="true">
+            <span><strong>When your booking is accepted</strong> → Through Uniplaces</span>
+            <span class="learning-price-details__chevron">⌄</span>
+          </button>
+          <div class="learning-price-details__content">
+            <div class="learning-price-details__line"><span>First rental payment</span><span>€1,700</span></div>
+            <div class="learning-price-details__line"><span>Service fee ⓘ</span><span>€750</span></div>
+            <div class="learning-price-details__line is-total"><span>Total</span><span>€2,450</span></div>
+          </div>
+        </section>
+        <section class="learning-price-details__section">
+          <button type="button" class="learning-price-details__toggle" aria-expanded="true">
+            <span><strong>When you move in</strong> → To landlord</span>
+            <span class="learning-price-details__chevron">⌄</span>
+          </button>
+          <div class="learning-price-details__content">
+            <div class="learning-price-details__subheading">One-time payments</div>
+            <div class="learning-price-details__line"><span>Security deposit</span><span>€1,700</span></div>
+            <div class="learning-price-details__subheading">Monthly payments</div>
+            <div class="learning-price-details__line"><span>Cleaning fee</span><span>€45</span></div>
+            <div class="learning-price-details__line is-total"><span>Total</span><span>€1,745</span></div>
+          </div>
+        </section>
+        <section class="learning-price-details__section">
+          <button type="button" class="learning-price-details__toggle" aria-expanded="false">
+            <span><strong>Monthly rent</strong> → To landlord</span>
+            <span><strong>€1,700</strong> <span class="learning-price-details__chevron">⌄</span></span>
+          </button>
+          <div class="learning-price-details__content" hidden>
+            <div class="learning-price-details__line"><span>Monthly rental payment</span><span>€1,700</span></div>
+          </div>
+        </section>
+        <div class="learning-price-details__guarantee"><span>♙</span><span>If you find it cheaper elsewhere, we'll refund the difference.</span></div>
+      </div>
+    `;
+    document.body.appendChild(detailsModal);
+
+    const detailsDialog = detailsModal.querySelector(".learning-price-details__dialog");
+    const closeButton = detailsModal.querySelector(".learning-price-details__close");
+    let reviewButton = null;
+
+    function openDetails(button) {
+      reviewButton = button;
+      detailsModal.hidden = false;
+      document.body.style.overflow = "hidden";
+      closeButton.focus();
+    }
+
+    function closeDetails() {
+      detailsModal.hidden = true;
+      document.body.style.overflow = "";
+      if (reviewButton) reviewButton.focus();
+    }
+
+    detailsModal.querySelectorAll(".learning-price-details__toggle").forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        const expanded = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!expanded));
+        const content = toggle.nextElementSibling;
+        if (content) content.hidden = expanded;
+      });
+    });
+
+    closeButton.addEventListener("click", closeDetails);
+    detailsModal.addEventListener("click", function (event) {
+      if (event.target === detailsModal) closeDetails();
+    });
+    detailsDialog.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (!detailsModal.hidden && event.key === "Escape") closeDetails();
+    });
+
+    document.addEventListener("learning:dates-selected", function () {
+      let summary = pricingBox.querySelector(".learning-booking-summary");
+      if (!summary) {
+        summary = document.createElement("div");
+        summary.className = "learning-booking-summary";
+        summary.innerHTML = `
+          <p class="learning-booking-summary__notice">Don't worry - pressing this button won't charge you anything!</p>
+          <div class="learning-booking-summary__intro">
+            <strong>If and only after the landlord approves</strong>
+            <span>You'll pay through Uniplaces</span>
+          </div>
+          <div class="learning-booking-summary__row">
+            <div><strong>First rental payment ⓘ</strong><span>Covers the first month</span></div>
+            <span class="learning-booking-summary__amount">€1,700</span>
+          </div>
+          <div class="learning-booking-summary__row">
+            <div><strong>Service fee ⓘ</strong><span>One-time payment</span></div>
+            <span class="learning-booking-summary__amount">€750</span>
+          </div>
+          <div class="learning-booking-summary__row learning-booking-summary__total">
+            <strong>Total</strong>
+            <strong class="learning-booking-summary__amount">€2,450</strong>
+          </div>
+          <div class="learning-booking-summary__guarantee">
+            <span class="learning-booking-summary__guarantee-icon">♙</span>
+            <span>If you find it cheaper elsewhere, we'll refund the difference.</span>
+          </div>
+          <button type="button" class="learning-booking-summary__review">
+            <span>Review price details</span><span aria-hidden="true">→</span>
+          </button>
+        `;
+        pricingBox.appendChild(summary);
+        summary.querySelector(".learning-booking-summary__review").addEventListener("click", function (event) {
+          openDetails(event.currentTarget);
+        });
+      }
+    });
+  });
+</script>
 <style id="learning-calendar-styles">
   body.calendar-open {
     overflow: hidden;
@@ -1552,7 +1930,8 @@
     }
 
     const launcherButtons = Array.from(document.querySelectorAll("button")).filter(function (button) {
-      return button.textContent.trim().toLowerCase() === "select dates";
+      return button.textContent.trim().toLowerCase() === "select dates" &&
+        Boolean(button.closest("#pricing-box"));
     });
     const pageDateInputs = Array.from(document.querySelectorAll("#pricing-box input")).slice(0, 2);
 
@@ -1560,6 +1939,7 @@
       button.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
+        if (button.dataset.bookingReady === "true") return;
         openCalendar(button);
       });
     });
@@ -1594,13 +1974,21 @@
     confirmButton.addEventListener("click", function () {
       if (!startDate || !endDate) return;
       launcherButtons.forEach(function (button) {
-        button.textContent = formatDate(startDate) + " – " + formatDate(endDate);
+        button.textContent = "Start booking";
+        button.dataset.bookingReady = "true";
         button.dataset.moveIn = startDate.toISOString();
         button.dataset.moveOut = endDate.toISOString();
         button.dataset.guests = String(guests);
       });
       if (pageDateInputs[0]) pageDateInputs[0].value = formatDate(startDate);
       if (pageDateInputs[1]) pageDateInputs[1].value = formatDate(endDate);
+      document.dispatchEvent(new CustomEvent("learning:dates-selected", {
+        detail: {
+          moveIn: new Date(startDate),
+          moveOut: new Date(endDate),
+          guests: guests
+        }
+      }));
       closeCalendar();
     });
 
