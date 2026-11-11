@@ -1,0 +1,34 @@
+self.__BUILD_MANIFEST = {
+  "/": [
+    "static/chunks/2x8zcqd2eew44.js"
+  ],
+  "/_error": [
+    "static/chunks/03rqfiaf4f6u1.js"
+  ],
+  "/accommodation/[city]/[offerId]": [
+    "static/chunks/02sv25l0vkjrb.js"
+  ],
+  "/accommodation/[city]/[offerId]/ask-the-landlord": [
+    "static/chunks/3pe12vtamsyzo.js"
+  ],
+  "/accommodation/[city]/[offerId]/ask-the-landlord/success": [
+    "static/chunks/07-9j1pcv7de7.js"
+  ],
+  "/ping": [
+    "static/chunks/2zl2lb43d5km0.js"
+  ],
+  "__rewrites": {
+    "afterFiles": [],
+    "beforeFiles": [],
+    "fallback": []
+  },
+  "sortedPages": [
+    "/",
+    "/_app",
+    "/_error",
+    "/accommodation/[city]/[offerId]",
+    "/accommodation/[city]/[offerId]/ask-the-landlord",
+    "/accommodation/[city]/[offerId]/ask-the-landlord/success",
+    "/ping"
+  ]
+};self.__BUILD_MANIFEST_CB && self.__BUILD_MANIFEST_CB()
