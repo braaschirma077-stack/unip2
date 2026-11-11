@@ -353,6 +353,607 @@
     });
   });
 </script>
+<style id="learning-calendar-styles">
+  body.calendar-open {
+    overflow: hidden;
+  }
+
+  .learning-calendar[hidden] {
+    display: none;
+  }
+
+  .learning-calendar {
+    position: fixed;
+    inset: 0;
+    z-index: 110000;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    background: rgba(34, 66, 81, .25);
+    font-family: Arial, sans-serif;
+  }
+
+  .learning-calendar__dialog {
+    width: min(950px, 100%);
+    max-height: calc(100vh - 56px);
+    overflow: auto;
+    padding: 42px 42px 38px;
+    border: 1px solid #bcc8ce;
+    border-radius: 15px;
+    color: #224251;
+    background: #fff;
+    box-shadow: 0 14px 45px rgba(34, 66, 81, .18);
+  }
+
+  .learning-calendar__top,
+  .learning-calendar__price,
+  .learning-calendar__guests,
+  .learning-calendar__date-fields,
+  .learning-calendar__footer {
+    display: flex;
+    align-items: center;
+  }
+
+  .learning-calendar__top {
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .learning-calendar__price {
+    gap: 5px;
+    color: #647a85;
+    font-size: 22px;
+  }
+
+  .learning-calendar__price strong {
+    color: #224251;
+    font-size: 38px;
+  }
+
+  .learning-calendar__guests {
+    gap: 14px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .learning-calendar__guest-button {
+    width: 31px;
+    height: 31px;
+    padding: 0;
+    border: 1px solid #647a85;
+    border-radius: 50%;
+    color: #224251;
+    background: #f7f9fa;
+    font-size: 24px;
+    line-height: 27px;
+  }
+
+  .learning-calendar__guest-button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+  }
+
+  .learning-calendar__date-fields {
+    gap: 10px;
+    margin: 22px 0 24px;
+  }
+
+  .learning-calendar__date-field {
+    width: 202px;
+    min-height: 78px;
+    padding: 14px;
+    border: 1px solid #bcc8ce;
+    border-radius: 10px;
+    color: #647a85;
+    background: #fff;
+    text-align: left;
+  }
+
+  .learning-calendar__date-field.is-active {
+    border: 2px solid #224251;
+  }
+
+  .learning-calendar__date-field span {
+    display: block;
+    margin-top: 8px;
+    color: #224251;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .learning-calendar__date-arrow {
+    padding: 10px;
+    color: #647a85;
+    font-size: 36px;
+  }
+
+  .learning-calendar__months {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 42px;
+  }
+
+  .learning-calendar__month {
+    min-width: 0;
+  }
+
+  .learning-calendar__month-header {
+    display: grid;
+    grid-template-columns: 36px 1fr 36px;
+    align-items: center;
+    min-height: 48px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .learning-calendar__month-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .learning-calendar__month-price {
+    display: block;
+    margin-top: 6px;
+    color: #647a85;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .learning-calendar__month-nav {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #647a85;
+    background: #f7f9fa;
+    font-size: 31px;
+    line-height: 31px;
+  }
+
+  .learning-calendar__month-nav:disabled {
+    visibility: hidden;
+  }
+
+  .learning-calendar__weekdays,
+  .learning-calendar__days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .learning-calendar__weekdays span {
+    padding: 10px 0;
+    color: #647a85;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .learning-calendar__day,
+  .learning-calendar__blank {
+    min-width: 0;
+    height: 48px;
+  }
+
+  .learning-calendar__day {
+    position: relative;
+    z-index: 1;
+    border: 0;
+    color: #224251;
+    background: transparent;
+    font-size: 15px;
+  }
+
+  .learning-calendar__day:disabled {
+    color: #b7c1c6;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  .learning-calendar__day.is-in-range {
+    background: #e1f6fd;
+  }
+
+  .learning-calendar__day.is-selected {
+    border-radius: 50%;
+    color: #fff;
+    background: #224251;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .learning-calendar__minimum {
+    min-height: 20px;
+    margin: 16px 0 0;
+    color: #647a85;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .learning-calendar__footer {
+    justify-content: flex-end;
+    gap: 34px;
+    margin-top: 10px;
+  }
+
+  .learning-calendar__clear,
+  .learning-calendar__confirm {
+    border: 0;
+    font-size: 16px;
+  }
+
+  .learning-calendar__clear {
+    color: #647a85;
+    background: transparent;
+  }
+
+  .learning-calendar__clear:disabled {
+    opacity: .45;
+  }
+
+  .learning-calendar__confirm {
+    min-width: 152px;
+    padding: 15px 22px;
+    border-radius: 10px;
+    color: #fff;
+    background: #00adef;
+    font-weight: 700;
+  }
+
+  .learning-calendar__confirm:disabled {
+    background: #bcc6ca;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 720px) {
+    .learning-calendar {
+      padding: 0;
+    }
+
+    .learning-calendar__dialog {
+      width: 100%;
+      max-height: 100vh;
+      min-height: 100vh;
+      padding: 24px 18px;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .learning-calendar__top {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .learning-calendar__price strong {
+      font-size: 30px;
+    }
+
+    .learning-calendar__date-field {
+      width: 100%;
+    }
+
+    .learning-calendar__date-arrow {
+      padding: 4px;
+    }
+
+    .learning-calendar__months {
+      grid-template-columns: 1fr;
+    }
+
+    .learning-calendar__month:nth-child(2) {
+      display: none;
+    }
+
+    .learning-calendar__footer {
+      position: sticky;
+      bottom: -24px;
+      padding: 16px 0 24px;
+      background: #fff;
+    }
+  }
+</style>
+<script id="learning-calendar-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const minimumStay = 30;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const modal = document.createElement("section");
+    modal.className = "learning-calendar";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Select rental dates");
+    modal.innerHTML = `
+      <div class="learning-calendar__dialog">
+        <div class="learning-calendar__top">
+          <div class="learning-calendar__price">From <strong>€1,700</strong><span>/month</span></div>
+          <div class="learning-calendar__guests">
+            <span aria-hidden="true">♙♙</span>
+            <span>Number of guests</span>
+            <button type="button" class="learning-calendar__guest-button learning-calendar__guest-minus" aria-label="Remove guest">−</button>
+            <span class="learning-calendar__guest-count">1</span>
+            <button type="button" class="learning-calendar__guest-button learning-calendar__guest-plus" aria-label="Add guest">+</button>
+          </div>
+        </div>
+        <div class="learning-calendar__date-fields">
+          <button type="button" class="learning-calendar__date-field learning-calendar__move-in is-active">MOVE IN<span>Choose date</span></button>
+          <span class="learning-calendar__date-arrow" aria-hidden="true">→</span>
+          <button type="button" class="learning-calendar__date-field learning-calendar__move-out">MOVE OUT<span>Choose date</span></button>
+        </div>
+        <div class="learning-calendar__months"></div>
+        <p class="learning-calendar__minimum">Minimum stay: 30 days</p>
+        <div class="learning-calendar__footer">
+          <button type="button" class="learning-calendar__clear" disabled>Clear Dates</button>
+          <button type="button" class="learning-calendar__confirm" disabled>Select dates</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const dialog = modal.querySelector(".learning-calendar__dialog");
+    const monthsContainer = modal.querySelector(".learning-calendar__months");
+    const moveInValue = modal.querySelector(".learning-calendar__move-in span");
+    const moveOutValue = modal.querySelector(".learning-calendar__move-out span");
+    const moveInField = modal.querySelector(".learning-calendar__move-in");
+    const moveOutField = modal.querySelector(".learning-calendar__move-out");
+    const clearButton = modal.querySelector(".learning-calendar__clear");
+    const confirmButton = modal.querySelector(".learning-calendar__confirm");
+    const minimumMessage = modal.querySelector(".learning-calendar__minimum");
+    const guestCount = modal.querySelector(".learning-calendar__guest-count");
+    const guestMinus = modal.querySelector(".learning-calendar__guest-minus");
+    const guestPlus = modal.querySelector(".learning-calendar__guest-plus");
+    let displayedMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    let startDate = null;
+    let endDate = null;
+    let guests = 1;
+    let triggerButton = null;
+
+    function dateAtMidnight(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function addDays(date, days) {
+      const result = dateAtMidnight(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    }
+
+    function sameDay(first, second) {
+      return first && second && first.getTime() === second.getTime();
+    }
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function monthDifference(first, second) {
+      return (first.getFullYear() - second.getFullYear()) * 12 + first.getMonth() - second.getMonth();
+    }
+
+    function updateSelection() {
+      moveInValue.textContent = startDate ? formatDate(startDate) : "Choose date";
+      moveOutValue.textContent = endDate ? formatDate(endDate) : "Choose date";
+      moveInField.classList.toggle("is-active", !startDate || Boolean(endDate));
+      moveOutField.classList.toggle("is-active", Boolean(startDate) && !endDate);
+      clearButton.disabled = !startDate;
+      confirmButton.disabled = !(startDate && endDate);
+
+      if (startDate && !endDate) {
+        minimumMessage.textContent = "Choose a move-out date on or after " + formatDate(addDays(startDate, minimumStay)) + ".";
+      } else if (startDate && endDate) {
+        const days = Math.round((endDate - startDate) / 86400000);
+        minimumMessage.textContent = days + " days selected.";
+      } else {
+        minimumMessage.textContent = "Minimum stay: 30 days";
+      }
+      renderMonths();
+    }
+
+    function chooseDate(date) {
+      if (!startDate || endDate) {
+        startDate = date;
+        endDate = null;
+      } else if (date >= addDays(startDate, minimumStay)) {
+        endDate = date;
+      }
+      updateSelection();
+    }
+
+    function createMonth(monthDate, index) {
+      const month = document.createElement("section");
+      month.className = "learning-calendar__month";
+
+      const header = document.createElement("div");
+      header.className = "learning-calendar__month-header";
+
+      const previous = document.createElement("button");
+      previous.type = "button";
+      previous.className = "learning-calendar__month-nav";
+      previous.setAttribute("aria-label", "Previous month");
+      previous.textContent = "‹";
+      previous.disabled = index !== 0 || monthDifference(displayedMonth, today) <= 0;
+      previous.addEventListener("click", function () {
+        displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1);
+        renderMonths();
+      });
+
+      const title = document.createElement("h3");
+      title.className = "learning-calendar__month-title";
+      title.innerHTML = new Intl.DateTimeFormat("en-GB", {
+        month: "long",
+        year: "numeric"
+      }).format(monthDate) + '<span class="learning-calendar__month-price">€1,700/month</span>';
+
+      const next = document.createElement("button");
+      next.type = "button";
+      next.className = "learning-calendar__month-nav";
+      next.setAttribute("aria-label", "Next month");
+      next.textContent = "›";
+      next.disabled = index !== 1;
+      next.addEventListener("click", function () {
+        displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 1);
+        renderMonths();
+      });
+
+      header.append(previous, title, next);
+      month.appendChild(header);
+
+      const weekdays = document.createElement("div");
+      weekdays.className = "learning-calendar__weekdays";
+      ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].forEach(function (day) {
+        const label = document.createElement("span");
+        label.textContent = day;
+        weekdays.appendChild(label);
+      });
+      month.appendChild(weekdays);
+
+      const days = document.createElement("div");
+      days.className = "learning-calendar__days";
+      const firstWeekday = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1).getDay();
+      const daysInMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
+
+      for (let blankIndex = 0; blankIndex < firstWeekday; blankIndex += 1) {
+        const blank = document.createElement("span");
+        blank.className = "learning-calendar__blank";
+        days.appendChild(blank);
+      }
+
+      for (let dayNumber = 1; dayNumber <= daysInMonth; dayNumber += 1) {
+        const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), dayNumber);
+        const day = document.createElement("button");
+        day.type = "button";
+        day.className = "learning-calendar__day";
+        day.textContent = String(dayNumber);
+        day.setAttribute("aria-label", formatDate(date));
+
+        const beforeToday = date < today;
+        const beforeMinimumEnd = startDate && !endDate && date < addDays(startDate, minimumStay);
+        day.disabled = beforeToday || Boolean(beforeMinimumEnd);
+
+        if (sameDay(date, startDate) || sameDay(date, endDate)) {
+          day.classList.add("is-selected");
+        } else if (startDate && endDate && date > startDate && date < endDate) {
+          day.classList.add("is-in-range");
+        }
+
+        day.addEventListener("click", function () {
+          chooseDate(date);
+        });
+        days.appendChild(day);
+      }
+
+      month.appendChild(days);
+      return month;
+    }
+
+    function renderMonths() {
+      monthsContainer.innerHTML = "";
+      for (let index = 0; index < 2; index += 1) {
+        const monthDate = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + index, 1);
+        monthsContainer.appendChild(createMonth(monthDate, index));
+      }
+    }
+
+    function openCalendar(button) {
+      triggerButton = button;
+      modal.hidden = false;
+      document.body.classList.add("calendar-open");
+      renderMonths();
+      moveInField.focus();
+    }
+
+    function closeCalendar() {
+      modal.hidden = true;
+      document.body.classList.remove("calendar-open");
+      if (triggerButton) triggerButton.focus();
+    }
+
+    const launcherButtons = Array.from(document.querySelectorAll("button")).filter(function (button) {
+      return button.textContent.trim().toLowerCase() === "select dates";
+    });
+    const pageDateInputs = Array.from(document.querySelectorAll("#pricing-box input")).slice(0, 2);
+
+    launcherButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openCalendar(button);
+      });
+    });
+
+    pageDateInputs.forEach(function (input) {
+      input.readOnly = true;
+      input.addEventListener("click", function (event) {
+        event.preventDefault();
+        openCalendar(input);
+      });
+    });
+
+    moveInField.addEventListener("click", function () {
+      startDate = null;
+      endDate = null;
+      updateSelection();
+    });
+
+    moveOutField.addEventListener("click", function () {
+      if (startDate) {
+        endDate = null;
+        updateSelection();
+      }
+    });
+
+    clearButton.addEventListener("click", function () {
+      startDate = null;
+      endDate = null;
+      updateSelection();
+    });
+
+    confirmButton.addEventListener("click", function () {
+      if (!startDate || !endDate) return;
+      launcherButtons.forEach(function (button) {
+        button.textContent = formatDate(startDate) + " – " + formatDate(endDate);
+        button.dataset.moveIn = startDate.toISOString();
+        button.dataset.moveOut = endDate.toISOString();
+        button.dataset.guests = String(guests);
+      });
+      if (pageDateInputs[0]) pageDateInputs[0].value = formatDate(startDate);
+      if (pageDateInputs[1]) pageDateInputs[1].value = formatDate(endDate);
+      closeCalendar();
+    });
+
+    guestMinus.addEventListener("click", function () {
+      guests = Math.max(1, guests - 1);
+      guestCount.textContent = String(guests);
+      guestMinus.disabled = guests === 1;
+    });
+
+    guestPlus.addEventListener("click", function () {
+      guests += 1;
+      guestCount.textContent = String(guests);
+      guestMinus.disabled = false;
+    });
+    guestMinus.disabled = true;
+
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) closeCalendar();
+    });
+    dialog.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!modal.hidden && event.key === "Escape") closeCalendar();
+    });
+
+    renderMonths();
+  });
+</script>
 <!-- saved from url=(0055)https://www.uniplaces.com/accommodation/barcelona/30543 -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" data-next-head=""><title data-next-head="">Super cool 3-bedroom flat with terrace - https://uniplaces.com/</title><meta http-equiv="X-UA-Compatible" content="IE=edge" data-next-head=""><meta name="baidu-site-verification" content="codeva-BnFvHwcblM" data-next-head=""><meta name="theme-color" content="#00adef" data-next-head=""><meta name="description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta name="title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="fb:app_id" content="436290349864717" data-next-head=""><meta property="og:title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="og:type" content="website" data-next-head=""><meta property="og:site_name" content="Uniplaces" data-next-head=""><meta property="og:description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="og:image" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:type" content="image/jpeg" data-next-head=""><meta property="og:image:url" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:secure_url" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta property="og:image:alt" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="og:locale" content="en_GB" data-next-head=""><meta property="og:url" content="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><meta property="og:locale:alternate" content="de_DE" data-next-head=""><meta property="og:locale:alternate" content="en_GB" data-next-head=""><meta property="og:locale:alternate" content="es_ES" data-next-head=""><meta property="og:locale:alternate" content="fr_FR" data-next-head=""><meta property="og:locale:alternate" content="it_IT" data-next-head=""><meta property="og:locale:alternate" content="nl_NL" data-next-head=""><meta property="og:locale:alternate" content="pl_PL" data-next-head=""><meta property="og:locale:alternate" content="pt_PT" data-next-head=""><meta property="og:locale:alternate" content="zh_CN" data-next-head=""><meta property="twitter:card" content="summary_large_image" data-next-head=""><meta property="twitter:site" content="@Uniplaces" data-next-head=""><meta property="twitter:creator" content="@uniplaces" data-next-head=""><meta property="twitter:url" content="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><meta property="twitter:title" content="Super cool 3-bedroom flat with terrace - https://uniplaces.com/" data-next-head=""><meta property="twitter:description" content="Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting" data-next-head=""><meta property="twitter:image" content="https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg" data-next-head=""><meta name="alexaVerifyID" content="-rCIO1OdzObYj0ckOXGvAr9Jiyg" data-next-head=""><link rel="canonical" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="x-default" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="de" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="en" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="es" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="fr" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="it" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="nl" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="pl" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="pt" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="alternate" hreflang="zh" href="https://uniplaces.com/accommodation/barcelona/30543" data-next-head=""><link rel="shortcut icon" href="https://static-spa-offer.uniplaces.com/images/icon-48x48.png" data-next-head=""><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="https://static-spa-offer.uniplaces.com/fonts/intervalnext-book.woff2" as="font" type="font/woff2" crossorigin="anonymous"><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Organization","name":"Uniplaces","legalName":"Universityplaces - Serviços de Internet, Lda.","url":"https://uniplaces.com/","foundingDate":"2013","logo":"https://uniplaces.com/static/images/logo.png","address":{"@type":"PostalAddress","streetAddress":"Largo Duque do Cadaval N17 Fração I","addressLocality":"Lisbon","postalCode":"1200-160","addressCountry":"Portugal"},"contactPoint":{"@type":"ContactPoint","contactType":"Customer Support","email":"support@uniplaces.com"},"sameAs":["https://facebook.com/uniplaces","https://instagram.com/uniplaces","https://twitter.com/uniplaces","https://youtube.com/user/uniplacesvideos","https://pinterest.com/uniplaces","https://linkedin.com/company/uniplaces","https://blog.uniplaces.com"]}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Product","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/","description":"Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting","image":"https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg","brand":{"@type":"RealEstateAgent","name":"Uniplaces","url":"https://uniplaces.com/"},"offers":{"@type":"Offer","availability":"OnlineOnly","url":"https://uniplaces.com/accommodation/barcelona/30543","price":1700,"priceCurrency":"EUR"}}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"Accommodation","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/","description":"Super cool 3-bedroom flat with terrace Barcelona ✓ Scam protection ✓ Certificate of Accommodation for Visa ✓ Hassle-free Renting","numberOfRooms":3,"photo":"https://cdn-static-new.uniplaces.com/property-photos/0b6d7b3b1db259e4f3e8b7342fe41abffbc5d1c2ea9350e3104bea4d15a10dbc/small.jpg","geo":{"@type":"GeoCoordinates","latitude":"41.42333333333333","longitude":"2.18"},"potentialAction":{"@type":"ReserveAction","target":{"@type":"EntryPoint","urlTemplate":"https://uniplaces.com/accommodation/barcelona/30543","actionPlatform":["http://schema.org/DesktopWebPlatform","http://schema.org/MobileWebPlatform"]},"result":{"@type":"LodgingReservation","name":"Rent Now"}}}</script><script type="application/ld+json" data-next-head="">{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"item":{"@id":"https://uniplaces.com/","name":"Home"}},{"@type":"ListItem","position":2,"item":{"@id":"https://uniplaces.com/accommodation/barcelona","name":"Student accommodation in Barcelona"}},{"@type":"ListItem","position":3,"item":{"@id":"https://uniplaces.com/accommodation/barcelona/neighbourhood/el-congres-i-els-indians-sant-andreu","name":"El Congrés i els Indians (Sant Andreu)"}},{"@type":"ListItem","position":4,"item":{"@id":"https://uniplaces.com/accommodation/barcelona/30543","name":"Super cool 3-bedroom flat with terrace - https://uniplaces.com/"}}]}</script><style>
   
