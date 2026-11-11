@@ -631,6 +631,253 @@
     });
   });
 </script>
+<style id="learning-map-styles">
+  body.map-open {
+    overflow: hidden;
+  }
+
+  .learning-map[hidden] {
+    display: none;
+  }
+
+  .learning-map {
+    position: fixed;
+    inset: 0;
+    z-index: 120000;
+    padding: 22px;
+    background: rgba(0, 0, 0, .56);
+  }
+
+  .learning-map__dialog {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #e7e5df;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, .25);
+  }
+
+  .learning-map__canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .learning-map__close {
+    position: absolute;
+    z-index: 1001;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #647a85;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 2px 10px rgba(34, 66, 81, .18);
+    font-size: 25px;
+    line-height: 31px;
+  }
+
+  .learning-map__marker {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 3px solid rgba(255, 255, 255, .75);
+    border-radius: 10px 10px 10px 2px;
+    color: #fff;
+    background: #58a9e8;
+    box-shadow: 0 3px 12px rgba(34, 66, 81, .25);
+    font-size: 19px;
+    transform: rotate(-45deg);
+  }
+
+  .learning-map__marker span {
+    transform: rotate(45deg);
+  }
+
+  .learning-map .leaflet-popup-content-wrapper {
+    border-radius: 7px;
+    color: #fff;
+    background: #647a85;
+    box-shadow: 0 6px 20px rgba(34, 66, 81, .25);
+  }
+
+  .learning-map .leaflet-popup-tip {
+    background: #647a85;
+  }
+
+  .learning-map .leaflet-popup-content {
+    width: 150px !important;
+    margin: 14px 18px;
+    font: 600 12px/1.45 Arial, sans-serif;
+    text-align: center;
+  }
+
+  .learning-map .leaflet-control-attribution {
+    font-size: 10px;
+  }
+
+  .learning-map__error {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: #224251;
+    font: 600 16px Arial, sans-serif;
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .learning-map {
+      padding: 0;
+    }
+
+    .learning-map__dialog {
+      border-radius: 0;
+    }
+  }
+</style>
+<script id="learning-map-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const mapButtons = Array.from(document.querySelectorAll("button")).filter(function (button) {
+      return button.textContent.trim().toLowerCase() === "map";
+    });
+    if (!mapButtons.length) return;
+
+    const modal = document.createElement("section");
+    modal.className = "learning-map";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Approximate property location");
+    modal.innerHTML = `
+      <div class="learning-map__dialog">
+        <div class="learning-map__canvas" aria-label="Interactive map"></div>
+        <button type="button" class="learning-map__close" aria-label="Close map">×</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const mapCanvas = modal.querySelector(".learning-map__canvas");
+    const closeButton = modal.querySelector(".learning-map__close");
+    const propertyLocation = [41.42333333333333, 2.18];
+    let leafletMap = null;
+    let returnFocus = null;
+    let leafletPromise = null;
+
+    function loadLeaflet() {
+      if (window.L) return Promise.resolve(window.L);
+      if (leafletPromise) return leafletPromise;
+
+      leafletPromise = new Promise(function (resolve, reject) {
+        if (!document.querySelector('link[data-learning-leaflet="true"]')) {
+          const stylesheet = document.createElement("link");
+          stylesheet.rel = "stylesheet";
+          stylesheet.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+          stylesheet.crossOrigin = "";
+          stylesheet.dataset.learningLeaflet = "true";
+          document.head.appendChild(stylesheet);
+        }
+
+        const existingScript = document.querySelector('script[data-learning-leaflet="true"]');
+        if (existingScript) {
+          existingScript.addEventListener("load", function () { resolve(window.L); }, { once: true });
+          existingScript.addEventListener("error", reject, { once: true });
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        script.crossOrigin = "";
+        script.dataset.learningLeaflet = "true";
+        script.addEventListener("load", function () { resolve(window.L); }, { once: true });
+        script.addEventListener("error", reject, { once: true });
+        document.head.appendChild(script);
+      });
+      return leafletPromise;
+    }
+
+    function createMap() {
+      const L = window.L;
+      leafletMap = L.map(mapCanvas, {
+        center: propertyLocation,
+        zoom: 16,
+        zoomControl: true
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(leafletMap);
+
+      L.circle(propertyLocation, {
+        radius: 350,
+        color: "#72b5db",
+        weight: 1,
+        opacity: .45,
+        fillColor: "#72b5db",
+        fillOpacity: .38
+      }).addTo(leafletMap);
+
+      const markerIcon = L.divIcon({
+        className: "",
+        html: '<div class="learning-map__marker"><span>⌂</span></div>',
+        iconSize: [34, 34],
+        iconAnchor: [17, 29],
+        popupAnchor: [0, 0]
+      });
+
+      L.marker(propertyLocation, { icon: markerIcon })
+        .addTo(leafletMap)
+        .bindPopup("The exact location will be given only after booking", {
+          closeButton: false,
+          offset: [0, -22],
+          autoPan: false
+        })
+        .openPopup();
+    }
+
+    async function openMap(button) {
+      returnFocus = button;
+      modal.hidden = false;
+      document.body.classList.add("map-open");
+      closeButton.focus();
+
+      try {
+        await loadLeaflet();
+        if (!leafletMap) createMap();
+        window.setTimeout(function () {
+          leafletMap.invalidateSize();
+          leafletMap.setView(propertyLocation, 16);
+        }, 0);
+      } catch (error) {
+        mapCanvas.innerHTML = '<div class="learning-map__error">The map could not be loaded. Check your internet connection and try again.</div>';
+      }
+    }
+
+    function closeMap() {
+      modal.hidden = true;
+      document.body.classList.remove("map-open");
+      if (returnFocus) returnFocus.focus();
+    }
+
+    mapButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openMap(button);
+      });
+    });
+
+    closeButton.addEventListener("click", closeMap);
+    document.addEventListener("keydown", function (event) {
+      if (!modal.hidden && event.key === "Escape") closeMap();
+    });
+  });
+</script>
 <style id="learning-calendar-styles">
   body.calendar-open {
     overflow: hidden;
