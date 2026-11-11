@@ -366,20 +366,19 @@
     position: fixed;
     inset: 0;
     z-index: 110000;
-    display: grid;
-    place-items: center;
-    padding: 28px;
-    background: rgba(34, 66, 81, .25);
+    display: block;
+    background: rgba(255, 255, 255, .08);
     font-family: Arial, sans-serif;
   }
 
   .learning-calendar__dialog {
-    width: min(950px, 100%);
-    max-height: calc(100vh - 56px);
+    position: fixed;
+    width: min(620px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
     overflow: auto;
-    padding: 42px 42px 38px;
+    padding: 26px 24px 22px;
     border: 1px solid #bcc8ce;
-    border-radius: 15px;
+    border-radius: 12px;
     color: #224251;
     background: #fff;
     box-shadow: 0 14px 45px rgba(34, 66, 81, .18);
@@ -402,30 +401,30 @@
   .learning-calendar__price {
     gap: 5px;
     color: #647a85;
-    font-size: 22px;
+    font-size: 16px;
   }
 
   .learning-calendar__price strong {
     color: #224251;
-    font-size: 38px;
+    font-size: 28px;
   }
 
   .learning-calendar__guests {
-    gap: 14px;
-    font-size: 18px;
+    gap: 10px;
+    font-size: 14px;
     font-weight: 700;
   }
 
   .learning-calendar__guest-button {
-    width: 31px;
-    height: 31px;
+    width: 25px;
+    height: 25px;
     padding: 0;
     border: 1px solid #647a85;
     border-radius: 50%;
     color: #224251;
     background: #f7f9fa;
-    font-size: 24px;
-    line-height: 27px;
+    font-size: 19px;
+    line-height: 21px;
   }
 
   .learning-calendar__guest-button:disabled {
@@ -435,13 +434,13 @@
 
   .learning-calendar__date-fields {
     gap: 10px;
-    margin: 22px 0 24px;
+    margin: 14px 0 12px;
   }
 
   .learning-calendar__date-field {
-    width: 202px;
-    min-height: 78px;
-    padding: 14px;
+    width: 120px;
+    min-height: 52px;
+    padding: 9px;
     border: 1px solid #bcc8ce;
     border-radius: 10px;
     color: #647a85;
@@ -455,22 +454,22 @@
 
   .learning-calendar__date-field span {
     display: block;
-    margin-top: 8px;
+    margin-top: 5px;
     color: #224251;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 700;
   }
 
   .learning-calendar__date-arrow {
-    padding: 10px;
+    padding: 5px;
     color: #647a85;
-    font-size: 36px;
+    font-size: 28px;
   }
 
   .learning-calendar__months {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 42px;
+    gap: 24px;
   }
 
   .learning-calendar__month {
@@ -479,37 +478,37 @@
 
   .learning-calendar__month-header {
     display: grid;
-    grid-template-columns: 36px 1fr 36px;
+    grid-template-columns: 30px 1fr 30px;
     align-items: center;
-    min-height: 48px;
-    margin-bottom: 10px;
+    min-height: 40px;
+    margin-bottom: 4px;
     text-align: center;
   }
 
   .learning-calendar__month-title {
     margin: 0;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
   }
 
   .learning-calendar__month-price {
     display: block;
-    margin-top: 6px;
+    margin-top: 4px;
     color: #647a85;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 400;
   }
 
   .learning-calendar__month-nav {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     border: 0;
     border-radius: 50%;
     color: #647a85;
     background: #f7f9fa;
-    font-size: 31px;
-    line-height: 31px;
+    font-size: 25px;
+    line-height: 25px;
   }
 
   .learning-calendar__month-nav:disabled {
@@ -522,17 +521,21 @@
     grid-template-columns: repeat(7, 1fr);
   }
 
+  .learning-calendar__days {
+    row-gap: 4px;
+  }
+
   .learning-calendar__weekdays span {
-    padding: 10px 0;
+    padding: 7px 0;
     color: #647a85;
-    font-size: 12px;
+    font-size: 10px;
     text-align: center;
   }
 
   .learning-calendar__day,
   .learning-calendar__blank {
     min-width: 0;
-    height: 48px;
+    height: 36px;
   }
 
   .learning-calendar__day {
@@ -541,7 +544,7 @@
     border: 0;
     color: #224251;
     background: transparent;
-    font-size: 15px;
+    font-size: 11px;
   }
 
   .learning-calendar__day:disabled {
@@ -554,32 +557,49 @@
     background: #e1f6fd;
   }
 
+  .learning-calendar__day.is-in-range.is-range-left {
+    border-radius: 18px 0 0 18px;
+  }
+
+  .learning-calendar__day.is-in-range.is-range-right {
+    border-radius: 0 18px 18px 0;
+  }
+
+  .learning-calendar__day.is-in-range.is-range-left.is-range-right {
+    border-radius: 18px;
+  }
+
   .learning-calendar__day.is-selected {
-    border-radius: 50%;
     color: #fff;
-    background: #224251;
+    background: radial-gradient(circle at center, #7bd8f5 0 15px, transparent 15.5px);
     font-weight: 700;
     text-decoration: none;
   }
 
+  .learning-calendar__day.is-selected.is-in-range {
+    background:
+      radial-gradient(circle at center, #7bd8f5 0 15px, transparent 15.5px),
+      #e1f6fd;
+  }
+
   .learning-calendar__minimum {
     min-height: 20px;
-    margin: 16px 0 0;
+    margin: 10px 0 0;
     color: #647a85;
-    font-size: 13px;
+    font-size: 11px;
     text-align: right;
   }
 
   .learning-calendar__footer {
     justify-content: flex-end;
-    gap: 34px;
-    margin-top: 10px;
+    gap: 24px;
+    margin-top: 6px;
   }
 
   .learning-calendar__clear,
   .learning-calendar__confirm {
     border: 0;
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .learning-calendar__clear {
@@ -592,9 +612,9 @@
   }
 
   .learning-calendar__confirm {
-    min-width: 152px;
-    padding: 15px 22px;
-    border-radius: 10px;
+    min-width: 110px;
+    padding: 11px 16px;
+    border-radius: 8px;
     color: #fff;
     background: #00adef;
     font-weight: 700;
@@ -611,6 +631,7 @@
     }
 
     .learning-calendar__dialog {
+      inset: 0 !important;
       width: 100%;
       max-height: 100vh;
       min-height: 100vh;
@@ -833,13 +854,23 @@
         day.setAttribute("aria-label", formatDate(date));
 
         const beforeToday = date < today;
-        const beforeMinimumEnd = startDate && !endDate && date < addDays(startDate, minimumStay);
+        const beforeMinimumEnd = startDate && !endDate && !sameDay(date, startDate) && date < addDays(startDate, minimumStay);
         day.disabled = beforeToday || Boolean(beforeMinimumEnd);
 
-        if (sameDay(date, startDate) || sameDay(date, endDate)) {
-          day.classList.add("is-selected");
-        } else if (startDate && endDate && date > startDate && date < endDate) {
+        const selected = sameDay(date, startDate) || sameDay(date, endDate);
+        const inRange = startDate && endDate && date >= startDate && date <= endDate;
+
+        if (inRange) {
           day.classList.add("is-in-range");
+          if (sameDay(date, startDate) || date.getDay() === 0 || dayNumber === 1) {
+            day.classList.add("is-range-left");
+          }
+          if (sameDay(date, endDate) || date.getDay() === 6 || dayNumber === daysInMonth) {
+            day.classList.add("is-range-right");
+          }
+        }
+        if (selected) {
+          day.classList.add("is-selected");
         }
 
         day.addEventListener("click", function () {
@@ -865,7 +896,22 @@
       modal.hidden = false;
       document.body.classList.add("calendar-open");
       renderMonths();
+      positionCalendar();
       moveInField.focus();
+    }
+
+    function positionCalendar() {
+      if (modal.hidden || window.innerWidth <= 720) return;
+      const pricingBox = document.getElementById("pricing-box");
+      const anchor = pricingBox ? pricingBox.getBoundingClientRect() : null;
+      const preferredTop = anchor ? anchor.top + 50 : (window.innerHeight - dialog.offsetHeight) / 2;
+      const preferredRight = anchor ? window.innerWidth - anchor.right - 12 : 24;
+      const top = Math.max(16, Math.min(preferredTop, window.innerHeight - dialog.offsetHeight - 16));
+      const right = Math.max(16, Math.min(preferredRight, window.innerWidth - dialog.offsetWidth - 16));
+      dialog.style.top = top + "px";
+      dialog.style.right = right + "px";
+      dialog.style.left = "auto";
+      dialog.style.bottom = "auto";
     }
 
     function closeCalendar() {
@@ -950,6 +996,7 @@
     document.addEventListener("keydown", function (event) {
       if (!modal.hidden && event.key === "Escape") closeCalendar();
     });
+    window.addEventListener("resize", positionCalendar);
 
     renderMonths();
   });
