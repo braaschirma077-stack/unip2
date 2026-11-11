@@ -745,7 +745,11 @@
     const mapButtons = Array.from(document.querySelectorAll("button")).filter(function (button) {
       return button.textContent.trim().toLowerCase() === "map";
     });
-    if (!mapButtons.length) return;
+    const addressLinks = Array.from(document.querySelectorAll('[role="button"]')).filter(function (element) {
+      return element.textContent.trim() === "Carrer de Garcilaso, El Congrés i els Indians (Sant Andreu), Barcelona";
+    });
+    const mapLaunchers = mapButtons.concat(addressLinks);
+    if (!mapLaunchers.length) return;
 
     const modal = document.createElement("section");
     modal.className = "learning-map";
@@ -864,11 +868,17 @@
       if (returnFocus) returnFocus.focus();
     }
 
-    mapButtons.forEach(function (button) {
-      button.addEventListener("click", function (event) {
+    mapLaunchers.forEach(function (launcher) {
+      launcher.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
-        openMap(button);
+        openMap(launcher);
+      });
+      launcher.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openMap(launcher);
+        }
       });
     });
 
@@ -876,6 +886,102 @@
     document.addEventListener("keydown", function (event) {
       if (!modal.hidden && event.key === "Escape") closeMap();
     });
+  });
+</script>
+<style id="learning-section-navigation-styles">
+  [data-learning-section-link="true"] {
+    cursor: pointer;
+  }
+
+  [data-learning-section-link="true"]:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid #00adef;
+    outline-offset: 4px;
+  }
+
+  [data-learning-section-link="true"][data-selected="true"] {
+    border-bottom: 2px solid #00adef;
+  }
+
+  [data-learning-section-link="true"][data-selected="true"] p {
+    color: #00adef;
+  }
+</style>
+<script id="learning-section-navigation-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const sectionIds = {
+      "Overview": "Overview",
+      "Availability": "Availability",
+      "Landlord": "Landlord",
+      "Services and expenses": "Services and expenses",
+      "Contract": "Contract"
+    };
+
+    const sectionNavigation = document.querySelector(".sc-bd497bf2-1");
+    if (!sectionNavigation) return;
+
+    const navigationItems = Array.from(sectionNavigation.children).filter(function (item) {
+      return Boolean(sectionIds[item.textContent.trim()]);
+    });
+    const sections = navigationItems.map(function (item) {
+      return document.getElementById(sectionIds[item.textContent.trim()]);
+    }).filter(Boolean);
+
+    function setActiveSection(sectionId) {
+      navigationItems.forEach(function (item) {
+        const selected = sectionIds[item.textContent.trim()] === sectionId;
+        item.dataset.selected = String(selected);
+        if (selected) {
+          item.setAttribute("aria-current", "true");
+        } else {
+          item.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    function scrollToSection(item) {
+      const sectionId = sectionIds[item.textContent.trim()];
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+
+      const header = document.querySelector(".header-desk-nav");
+      const offset = (header ? header.offsetHeight : 0) + 18;
+      const top = section.getBoundingClientRect().top + window.scrollY - offset;
+      setActiveSection(sectionId);
+      window.scrollTo({ top: top, behavior: "smooth" });
+    }
+
+    navigationItems.forEach(function (item) {
+      item.dataset.learningSectionLink = "true";
+      item.tabIndex = 0;
+      item.setAttribute("role", "link");
+      item.setAttribute("aria-label", "Go to " + item.textContent.trim());
+
+      item.addEventListener("click", function () {
+        scrollToSection(item);
+      });
+      item.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          scrollToSection(item);
+        }
+      });
+    });
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(function (entries) {
+        const visibleSections = entries
+          .filter(function (entry) { return entry.isIntersecting; })
+          .sort(function (first, second) { return first.boundingClientRect.top - second.boundingClientRect.top; });
+        if (visibleSections.length) setActiveSection(visibleSections[0].target.id);
+      }, {
+        rootMargin: "-90px 0px -65% 0px",
+        threshold: 0
+      });
+      sections.forEach(function (section) { observer.observe(section); });
+    }
+
+    setActiveSection("Overview");
   });
 </script>
 <style id="learning-calendar-styles">
