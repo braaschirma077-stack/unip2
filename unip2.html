@@ -1391,6 +1391,316 @@
     });
   });
 </script>
+<style id="learning-features-modal-styles">
+  body.features-modal-open {
+    overflow: hidden;
+  }
+
+  .learning-features-modal[hidden] {
+    display: none;
+  }
+
+  .learning-features-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 115000;
+    display: grid;
+    place-items: center;
+    padding: 36px;
+    background: rgba(0, 0, 0, .58);
+    font-family: Arial, sans-serif;
+  }
+
+  .learning-features-modal__dialog {
+    width: min(780px, 100%);
+    max-height: calc(100vh - 72px);
+    overflow: auto;
+    border-radius: 12px;
+    color: #224251;
+    background: #fff;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, .25);
+  }
+
+  .learning-features-modal__dialog.is-compact {
+    overflow: hidden;
+  }
+
+  .learning-features-modal__header {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 24px;
+    border-bottom: 1px solid #e4eaed;
+    background: #fff;
+  }
+
+  .learning-features-modal__close {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    color: #647a85;
+    background: transparent;
+    font-size: 30px;
+    line-height: 34px;
+  }
+
+  .learning-features-modal__body {
+    padding: 34px 32px 38px;
+  }
+
+  .learning-features-modal__section + .learning-features-modal__section {
+    margin-top: 34px;
+  }
+
+  .learning-features-modal__section h2 {
+    margin: 0 0 28px;
+    font: 700 20px/1.25 Arial, sans-serif;
+  }
+
+  .learning-features-modal__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px 34px;
+  }
+
+  .learning-features-modal__item {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .learning-features-modal__item.is-unavailable {
+    color: #bcc6ca;
+  }
+
+  .learning-features-modal__icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border: 1.5px solid currentColor;
+    border-radius: 5px;
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .learning-features-modal__item.is-unavailable .learning-features-modal__icon {
+    opacity: .8;
+  }
+
+  @media (max-width: 650px) {
+    .learning-features-modal {
+      padding: 0;
+    }
+
+    .learning-features-modal__dialog {
+      width: 100%;
+      max-height: 100vh;
+      min-height: 100vh;
+      border-radius: 0;
+    }
+
+    .learning-features-modal__body {
+      padding: 26px 20px 34px;
+    }
+
+    .learning-features-modal__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 23px 16px;
+    }
+  }
+</style>
+<script id="learning-features-modal-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const featuresButton = Array.from(document.querySelectorAll("button")).find(function (button) {
+      return button.textContent.trim().toLowerCase() === "see all features";
+    });
+    const amenitiesButton = Array.from(document.querySelectorAll("button")).find(function (button) {
+      return button.textContent.trim().toLowerCase() === "see all amenities";
+    });
+    if (!featuresButton && !amenitiesButton) return;
+
+    const featureSections = {
+      features: [
+        {
+          title: "Apartment",
+          items: [
+            ["75 m²", "⌗"], ["Wi-Fi", "⌁"], ["Cable Tv", "▣"],
+            ["Central heating", "♨"], ["Air conditioning", "❄"], ["Outdoor area", "♧"],
+            ["Elevator", "↕"], ["Bed linen and towels", "▰"], ["Accessibility", "♿", false]
+          ]
+        }
+      ],
+      amenities: [
+        {
+          title: "Apartment",
+          items: [
+            ["Wi-Fi", "⌁"], ["Cable Tv", "▣"], ["Central heating", "♨"],
+            ["Air conditioning", "❄"], ["Outdoor area", "♧"], ["Elevator", "↕"],
+            ["Bed linen and towels", "▰"], ["Accessibility", "♿", false]
+          ]
+        },
+        {
+          title: "Living room",
+          items: [
+            ["Chairs", "♧"], ["Sofa", "▱"], ["Window", "▥"],
+            ["Balcony", "▤"], ["Table", "⊓"], ["Tv", "▣"],
+            ["Desk", "⌑", false], ["Sofa bed", "▱", false], ["Coffee table", "⊢", false]
+          ]
+        },
+        {
+          title: "Kitchen",
+          items: [
+            ["Fridge", "▥"], ["Oven", "□"], ["Microwave", "▣"],
+            ["Dishwasher", "≋"], ["Washing machine", "◉"], ["Crockery and cutlery", "⋔"]
+          ]
+        },
+        {
+          title: "Bathroom",
+          items: [
+            ["Shower", "♨"], ["Toilet", "◫"], ["Washbasin", "▽"],
+            ["Hair dryer", "≈", false]
+          ]
+        }
+      ]
+    };
+
+    const modal = document.createElement("section");
+    modal.className = "learning-features-modal";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Property features");
+    modal.innerHTML = `
+      <div class="learning-features-modal__dialog">
+        <header class="learning-features-modal__header">
+          <button type="button" class="learning-features-modal__close" aria-label="Close">×</button>
+        </header>
+        <div class="learning-features-modal__body"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const dialog = modal.querySelector(".learning-features-modal__dialog");
+    const body = modal.querySelector(".learning-features-modal__body");
+    const closeButton = modal.querySelector(".learning-features-modal__close");
+    let returnFocus = null;
+
+    function renderSections(mode) {
+      body.innerHTML = "";
+      featureSections[mode].forEach(function (section) {
+        const sectionElement = document.createElement("section");
+        sectionElement.className = "learning-features-modal__section";
+        const title = document.createElement("h2");
+        title.textContent = section.title;
+        sectionElement.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.className = "learning-features-modal__grid";
+        section.items.forEach(function (item) {
+          const available = item[2] !== false;
+          const itemElement = document.createElement("div");
+          itemElement.className = "learning-features-modal__item" + (available ? "" : " is-unavailable");
+          itemElement.innerHTML = '<span class="learning-features-modal__icon" aria-hidden="true">' +
+            item[1] + '</span><span>' + item[0] + "</span>";
+          grid.appendChild(itemElement);
+        });
+        sectionElement.appendChild(grid);
+        body.appendChild(sectionElement);
+      });
+    }
+
+    function openModal(mode, button) {
+      returnFocus = button;
+      renderSections(mode);
+      dialog.classList.toggle("is-compact", mode === "features");
+      modal.setAttribute("aria-label", mode === "features" ? "All property features" : "All property amenities");
+      modal.hidden = false;
+      document.body.classList.add("features-modal-open");
+      dialog.scrollTop = 0;
+      closeButton.focus();
+    }
+
+    function closeModal() {
+      modal.hidden = true;
+      document.body.classList.remove("features-modal-open");
+      if (returnFocus) returnFocus.focus();
+    }
+
+    if (featuresButton) {
+      featuresButton.addEventListener("click", function () {
+        openModal("features", featuresButton);
+      });
+    }
+    if (amenitiesButton) {
+      amenitiesButton.addEventListener("click", function () {
+        openModal("amenities", amenitiesButton);
+      });
+    }
+
+    closeButton.addEventListener("click", closeModal);
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) closeModal();
+    });
+    dialog.addEventListener("click", function (event) {
+      event.stopPropagation();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (!modal.hidden && event.key === "Escape") closeModal();
+    });
+  });
+</script>
+<script id="learning-faq-script">
+  document.addEventListener("DOMContentLoaded", function () {
+    const faqItems = Array.from(document.querySelectorAll(".sc-691384bd-0"));
+    if (!faqItems.length) return;
+
+    function setExpanded(item, expanded) {
+      const heading = item.querySelector(".sc-691384bd-3");
+      const content = item.querySelector(".sc-691384bd-5");
+      const chevron = heading ? heading.querySelector(".chevron") : null;
+      if (!heading || !content) return;
+      heading.setAttribute("aria-expanded", String(expanded));
+      content.classList.toggle("open", expanded);
+      if (chevron) chevron.classList.toggle("open", expanded);
+    }
+
+    function toggleItem(selectedItem) {
+      const heading = selectedItem.querySelector(".sc-691384bd-3");
+      const willExpand = heading.getAttribute("aria-expanded") !== "true";
+      faqItems.forEach(function (item) {
+        setExpanded(item, item === selectedItem && willExpand);
+      });
+    }
+
+    faqItems.forEach(function (item, index) {
+      const heading = item.querySelector(".sc-691384bd-3");
+      if (!heading) return;
+      heading.tabIndex = 0;
+      heading.setAttribute("role", "button");
+      heading.setAttribute("aria-label", "Toggle answer for " + heading.textContent.trim());
+      heading.addEventListener("click", function () {
+        toggleItem(item);
+      });
+      heading.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " " || event.key === "Spacebar" || event.code === "Space") {
+          event.preventDefault();
+          toggleItem(item);
+        }
+      });
+      setExpanded(item, index === 0);
+    });
+  });
+</script>
 <style id="learning-calendar-styles">
   body.calendar-open {
     overflow: hidden;
