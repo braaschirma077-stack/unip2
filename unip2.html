@@ -136,10 +136,40 @@
 
   .learning-gallery__thumbs {
     display: flex;
+    justify-content: safe center;
     gap: 6px;
     overflow-x: auto;
-    padding: 12px 49px 14px;
-    scrollbar-color: rgba(255, 255, 255, .5) transparent;
+    padding: 12px 49px 18px;
+    scrollbar-width: none;
+  }
+
+  .learning-gallery__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .learning-gallery__scrollbar[hidden] {
+    display: none;
+  }
+
+  .learning-gallery__scrollbar {
+    position: absolute;
+    right: 49px;
+    bottom: 5px;
+    left: 49px;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .18);
+  }
+
+  .learning-gallery__scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .72);
+    transform: translateX(0);
   }
 
   .learning-gallery__thumb {
@@ -184,6 +214,12 @@
 
     .learning-gallery__thumbs {
       padding: 10px 12px 14px;
+    }
+
+    .learning-gallery__scrollbar {
+      right: 12px;
+      bottom: 3px;
+      left: 12px;
     }
 
     .learning-gallery__arrow {
@@ -250,12 +286,17 @@
         <button type="button" class="learning-gallery__arrow learning-gallery__next" aria-label="Next photo">›</button>
       </div>
       <div class="learning-gallery__thumbs" aria-label="Photo thumbnails"></div>
+      <div class="learning-gallery__scrollbar" hidden aria-hidden="true">
+        <div class="learning-gallery__scrollbar-thumb"></div>
+      </div>
     `;
     document.body.appendChild(modal);
 
     const mainImage = modal.querySelector(".learning-gallery__main-image");
     const counter = modal.querySelector(".learning-gallery__counter");
     const thumbnailRail = modal.querySelector(".learning-gallery__thumbs");
+    const thumbnailScrollbar = modal.querySelector(".learning-gallery__scrollbar");
+    const thumbnailScrollbarThumb = modal.querySelector(".learning-gallery__scrollbar-thumb");
     const closeButton = modal.querySelector(".learning-gallery__close");
     const saveButton = modal.querySelector(".learning-gallery__save");
     let currentIndex = 0;
@@ -272,6 +313,24 @@
       });
       thumbnailRail.appendChild(button);
     });
+
+    function updateThumbnailScrollbar() {
+      const overflow = thumbnailRail.scrollWidth > thumbnailRail.clientWidth + 1;
+      thumbnailScrollbar.hidden = !overflow;
+      if (!overflow) return;
+
+      const trackWidth = thumbnailScrollbar.clientWidth;
+      const thumbWidth = Math.max(40, trackWidth * (thumbnailRail.clientWidth / thumbnailRail.scrollWidth));
+      const maximumScroll = thumbnailRail.scrollWidth - thumbnailRail.clientWidth;
+      const maximumOffset = trackWidth - thumbWidth;
+      const offset = maximumScroll > 0 ? (thumbnailRail.scrollLeft / maximumScroll) * maximumOffset : 0;
+      thumbnailScrollbarThumb.style.width = thumbWidth + "px";
+      thumbnailScrollbarThumb.style.transform = "translateX(" + offset + "px)";
+    }
+
+    thumbnailRail.addEventListener("scroll", updateThumbnailScrollbar, { passive: true });
+    window.addEventListener("resize", updateThumbnailScrollbar);
+    window.requestAnimationFrame(updateThumbnailScrollbar);
 
     function showPhoto(index) {
       currentIndex = (index + galleryImages.length) % galleryImages.length;
@@ -293,6 +352,7 @@
       modal.hidden = false;
       document.body.classList.add("gallery-open");
       showPhoto(index);
+      window.requestAnimationFrame(updateThumbnailScrollbar);
       closeButton.focus();
     }
 
